@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>everything — $everything</title>
+<meta name="description" content="everything is everything. on solana." />
+<meta property="og:title" content="everything — $everything" />
+<meta property="og:description" content="everything is everything." />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="everything — $everything" />
+<meta name="twitter:description" content="everything is everything." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,400&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --fg: #f5f1e8;
+    --muted: #8a8478;
+    --accent: #d4af37;
+    --accent-soft: rgba(212, 175, 55, 0.12);
+    --grain-opacity: 0.04;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: 'Cormorant Garamond', 'Times New Roman', serif;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  /* film grain overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 100;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+    opacity: var(--grain-opacity);
+    mix-blend-mode: overlay;
+  }
+
+  /* subtle radial vignette */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.6) 100%);
+  }
+
+  .stage {
+    position: relative;
+    z-index: 2;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 2.5rem 3rem;
+  }
+
+  /* top bar */
+  .top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    opacity: 0;
+    animation: fadeIn 1.2s ease 0.2s forwards;
+  }
+
+  .top .ticker {
+    color: var(--accent);
+  }
+
+  .top .ticker::before {
+    content: '●';
+    margin-right: 0.5rem;
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* hero */
+  .hero {
+    text-align: center;
+    padding: 4rem 0 2rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .kicker {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 2.5rem;
+    opacity: 0;
+    animation: fadeIn 1.2s ease 0.6s forwards;
+  }
+
+  .kicker span {
+    display: inline-block;
+    padding: 0 1rem;
+  }
+
+  .kicker::before, .kicker::after {
+    content: '';
+    display: inline-block;
+    width: 40px;
+    height: 1px;
+    background: var(--muted);
+    vertical-align: middle;
+  }
+
+  h1 {
+    font-weight: 300;
+    font-size: clamp(4rem, 14vw, 12rem);
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+    font-style: italic;
+    opacity: 0;
+    animation: heroIn 1.6s cubic-bezier(0.22, 1, 0.36, 1) 0.8s forwards;
+  }
+
+  h1 .amp {
+    color: var(--accent);
+    font-style: normal;
+    font-weight: 400;
+  }
+
+  @keyframes heroIn {
+    from { opacity: 0; transform: translateY(20px) scale(0.98); filter: blur(8px); }
+    to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+  }
+
+  .tag {
+    margin-top: 2.5rem;
+    font-size: 1.35rem;
+    color: var(--fg);
+    font-style: italic;
+    font-weight: 300;
+    opacity: 0;
+    animation: fadeIn 1.4s ease 1.4s forwards;
+  }
+
+  .tag-secondary {
+    margin-top: 0.75rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--muted);
+    opacity: 0;
+    animation: fadeIn 1.4s ease 1.6s forwards;
+  }
+
+  /* CTA */
+  .cta-wrap {
+    margin: 3.5rem 0 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+    opacity: 0;
+    animation: fadeIn 1.4s ease 1.8s forwards;
+  }
+
+  .cta {
+    display: inline-block;
+    padding: 1.1rem 3rem;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    text-decoration: none;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .cta::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--accent);
+    transform: translateY(100%);
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    z-index: -1;
+  }
+
+  .cta:hover { color: var(--bg); }
+  .cta:hover::before { transform: translateY(0); }
+
+  /* contract address */
+  .ca {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    background: rgba(255,255,255,0.02);
+    padding: 0.65rem 1.1rem;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .ca .label { color: var(--accent); }
+
+  .ca .addr {
+    color: var(--fg);
+    font-weight: 400;
+  }
+
+  .copy-btn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: inherit;
+    padding: 0;
+    transition: color 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+  }
+
+  .copy-btn:hover { color: var(--accent); }
+  .copy-btn.copied { color: var(--accent); }
+
+  /* stats row */
+  .stats {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+    margin-top: 2rem;
+    opacity: 0;
+    animation: fadeIn 1.4s ease 2s forwards;
+    flex-wrap: wrap;
+  }
+
+  .stat {
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .stat .num {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 1.8rem;
+    color: var(--fg);
+    font-weight: 400;
+  }
+
+  .stat .lbl {
+    font-size: 0.65rem;
+    color: var(--muted);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-top: 0.25rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .stat-mc .num {
+    color: var(--accent);
+    font-size: 2.2rem;
+  }
+
+  .live-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #4ade80;
+    box-shadow: 0 0 8px #4ade80;
+    animation: pulse 2.4s ease-in-out infinite;
+    display: inline-block;
+  }
+
+  .live-dot.stale {
+    background: #f87171;
+    box-shadow: 0 0 8px #f87171;
+  }
+
+  .change-up { color: #4ade80 !important; }
+  .change-down { color: #f87171 !important; }
+
+  .num.loading {
+    opacity: 0.4;
+    animation: shimmer 1.4s ease-in-out infinite;
+  }
+
+  @keyframes shimmer {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.7; }
+  }
+
+  /* footer */
+  .footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    opacity: 0;
+    animation: fadeIn 1.4s ease 2.2s forwards;
+  }
+
+  .links {
+    display: flex;
+    gap: 2rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  .links a {
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.3s ease;
+    position: relative;
+  }
+
+  .links a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -3px;
+    width: 0;
+    height: 1px;
+    background: var(--accent);
+    transition: width 0.3s ease;
+  }
+
+  .links a:hover { color: var(--fg); }
+  .links a:hover::after { width: 100%; }
+
+  .whisper {
+    font-style: italic;
+    font-size: 0.95rem;
+    color: var(--muted);
+  }
+
+  @keyframes fadeIn {
+    to { opacity: 1; }
+  }
+
+  /* floating word ambience */
+  .ambient {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 0;
+  }
+
+  .ambient span {
+    position: absolute;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    color: rgba(245, 241, 232, 0.025);
+    font-size: clamp(8rem, 18vw, 16rem);
+    white-space: nowrap;
+    animation: drift 60s linear infinite;
+  }
+
+  .ambient span:nth-child(1) { top: 5%; left: -20%; animation-duration: 80s; }
+  .ambient span:nth-child(2) { top: 60%; left: -30%; animation-duration: 120s; animation-delay: -20s; font-size: clamp(6rem, 14vw, 12rem); }
+  .ambient span:nth-child(3) { top: 85%; left: -25%; animation-duration: 100s; animation-delay: -50s; font-size: clamp(4rem, 10vw, 9rem); }
+
+  @keyframes drift {
+    from { transform: translateX(0); }
+    to { transform: translateX(140vw); }
+  }
+
+  /* responsive */
+  @media (max-width: 768px) {
+    .stage { padding: 1.5rem 1.25rem; }
+    .top { font-size: 0.6rem; }
+    .top .ticker-meta { display: none; }
+    .stats { gap: 1.5rem; }
+    .footer { flex-direction: column; gap: 1.5rem; }
+    .links { gap: 1.25rem; }
+    .ca { font-size: 0.62rem; padding: 0.55rem 0.85rem; flex-wrap: wrap; justify-content: center; }
+    .kicker::before, .kicker::after { width: 20px; }
+    .tag { font-size: 1.1rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="ambient" aria-hidden="true">
+  <span>everything</span>
+  <span>everything</span>
+  <span>everything</span>
+</div>
+
+<div class="stage">
+
+  <header class="top">
+    <div class="ticker">$everything <span class="ticker-meta">/ solana</span></div>
+    <div>est. <span id="year">2026</span></div>
+  </header>
+
+  <main class="hero">
+    <div class="kicker"><span>a meditation on excess</span></div>
+
+    <h1><em>every</em><span class="amp">·</span><em>thing</em></h1>
+
+    <p class="tag">everything is everything.</p>
+    <p class="tag-secondary">— a token of total inclusion —</p>
+
+    <div class="cta-wrap">
+      <a class="cta" href="#" id="buyBtn">acquire $everything</a>
+
+      <div class="ca">
+        <span class="label">CA</span>
+        <span class="addr" id="addr">000000…0000pump</span>
+        <button class="copy-btn" id="copyBtn" aria-label="Copy contract address">copy</button>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat stat-mc">
+        <div class="num" id="mcap">—</div>
+        <div class="lbl">
+          market cap
+          <span class="live-dot" id="liveDot" title="live"></span>
+        </div>
+      </div>
+      <div class="stat">
+        <div class="num" id="price">—</div>
+        <div class="lbl">price</div>
+      </div>
+      <div class="stat">
+        <div class="num" id="change">—</div>
+        <div class="lbl">24h</div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <nav class="links">
+      <a href="#" target="_blank" rel="noopener">dexscreener</a>
+      <a href="#" target="_blank" rel="noopener">pump.fun</a>
+      <a href="#" target="_blank" rel="noopener">x / twitter</a>
+      <a href="#" target="_blank" rel="noopener">telegram</a>
+    </nav>
+    <div class="whisper">everything, eventually.</div>
+  </footer>
+
+</div>
+
+<script>
+  // year
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // ============================================
+  // MARKET CAP LIVE FETCH
+  // ============================================
+  // Set your token's contract address here.
+  // For Solana / pump.fun tokens, DexScreener auto-indexes them once they have a pool.
+  const TOKEN_ADDRESS = '000000000000000000000000000000000000pump'; // <-- REPLACE with your CA
+  const CHAIN = 'solana';
+  const REFRESH_MS = 30000; // 30 seconds
+
+  const mcapEl = document.getElementById('mcap');
+  const priceEl = document.getElementById('price');
+  const changeEl = document.getElementById('change');
+  const liveDot = document.getElementById('liveDot');
+
+  // initial loading state
+  [mcapEl, priceEl, changeEl].forEach(el => el.classList.add('loading'));
+
+  function formatMcap(n) {
+    if (n == null || isNaN(n)) return '—';
+    if (n >= 1_000_000_000) return '$' + (n / 1_000_000_000).toFixed(2) + 'B';
+    if (n >= 1_000_000) return '$' + (n / 1_000_000).toFixed(2) + 'M';
+    if (n >= 1_000) return '$' + (n / 1_000).toFixed(1) + 'K';
+    return '$' + n.toFixed(0);
+  }
+
+  function formatPrice(n) {
+    if (n == null || isNaN(n)) return '—';
+    if (n < 0.0001) return '$' + n.toExponential(2);
+    if (n < 1) return '$' + n.toFixed(6);
+    return '$' + n.toFixed(4);
+  }
+
+  function formatChange(n) {
+    if (n == null || isNaN(n)) return '—';
+    const sign = n >= 0 ? '+' : '';
+    return sign + n.toFixed(2) + '%';
+  }
+
+  async function fetchMarketData() {
+    try {
+      // DexScreener API — free, no key required
+      const url = `https://api.dexscreener.com/latest/dex/tokens/${TOKEN_ADDRESS}`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+
+      if (!data.pairs || data.pairs.length === 0) {
+        // No pool yet — token might not be tradeable
+        mcapEl.textContent = 'soon';
+        priceEl.textContent = '—';
+        changeEl.textContent = '—';
+        [mcapEl, priceEl, changeEl].forEach(el => el.classList.remove('loading'));
+        liveDot.classList.add('stale');
+        return;
+      }
+
+      // Pick the pair with the highest liquidity (most reliable price)
+      const pair = data.pairs.reduce((best, p) => {
+        const bestLiq = best?.liquidity?.usd || 0;
+        const pLiq = p?.liquidity?.usd || 0;
+        return pLiq > bestLiq ? p : best;
+      }, data.pairs[0]);
+
+      const mcap = pair.marketCap ?? pair.fdv;
+      const price = parseFloat(pair.priceUsd);
+      const change24h = pair.priceChange?.h24;
+
+      mcapEl.textContent = formatMcap(mcap);
+      priceEl.textContent = formatPrice(price);
+      changeEl.textContent = formatChange(change24h);
+
+      // Color the 24h change
+      changeEl.classList.remove('change-up', 'change-down');
+      if (change24h > 0) changeEl.classList.add('change-up');
+      else if (change24h < 0) changeEl.classList.add('change-down');
+
+      [mcapEl, priceEl, changeEl].forEach(el => el.classList.remove('loading'));
+      liveDot.classList.remove('stale');
+      liveDot.title = 'live · updated ' + new Date().toLocaleTimeString();
+    } catch (err) {
+      console.error('Market data fetch failed:', err);
+      liveDot.classList.add('stale');
+      liveDot.title = 'connection issue';
+      [mcapEl, priceEl, changeEl].forEach(el => el.classList.remove('loading'));
+      if (mcapEl.textContent === '—') mcapEl.textContent = '—';
+    }
+  }
+
+  // Initial fetch + polling
+  fetchMarketData();
+  setInterval(fetchMarketData, REFRESH_MS);
+
+  // Pause polling when tab hidden, refresh when visible
+  let pollInterval = setInterval(fetchMarketData, REFRESH_MS);
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      clearInterval(pollInterval);
+    } else {
+      fetchMarketData();
+      pollInterval = setInterval(fetchMarketData, REFRESH_MS);
+    }
+  });
+
+  // ============================================
+  // COPY CA
+  // ============================================
+  const copyBtn = document.getElementById('copyBtn');
+  const addr = document.getElementById('addr');
+  copyBtn.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(addr.textContent.trim());
+      copyBtn.textContent = 'copied';
+      copyBtn.classList.add('copied');
+      setTimeout(() => {
+        copyBtn.textContent = 'copy';
+        copyBtn.classList.remove('copied');
+      }, 1800);
+    } catch (e) {
+      copyBtn.textContent = 'err';
+      setTimeout(() => { copyBtn.textContent = 'copy'; }, 1500);
+    }
+  });
+
+  // subtle cursor parallax on the ambient layer
+  const ambient = document.querySelector('.ambient');
+  document.addEventListener('mousemove', (e) => {
+    const x = (e.clientX / window.innerWidth - 0.5) * 20;
+    const y = (e.clientY / window.innerHeight - 0.5) * 20;
+    ambient.style.transform = `translate(${x}px, ${y}px)`;
+  });
+</script>
+
+</body>
+</html>
